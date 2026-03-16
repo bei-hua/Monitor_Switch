@@ -8,6 +8,7 @@ internal sealed class MonitorSwitcherApplicationContext : ApplicationContext
     private readonly HttpControlServer _server;
     private readonly NotifyIcon _notifyIcon;
     private readonly ToolStripMenuItem _statusMenuItem;
+    private readonly ToolStripMenuItem _startupMenuItem;
     private readonly SynchronizationContext _uiContext;
 
     public MonitorSwitcherApplicationContext()
@@ -18,6 +19,11 @@ internal sealed class MonitorSwitcherApplicationContext : ApplicationContext
         {
             Enabled = false
         };
+        _startupMenuItem = new ToolStripMenuItem("开机自启动")
+        {
+            CheckOnClick = false
+        };
+        _startupMenuItem.Click += (_, _) => ToggleStartup();
 
         var contextMenu = new ContextMenuStrip();
         contextMenu.Opening += HandleMenuOpening;
@@ -26,6 +32,7 @@ internal sealed class MonitorSwitcherApplicationContext : ApplicationContext
         contextMenu.Items.Add(CreateMenuItem("切换到主显示器（仅电脑屏幕）", (_, _) => SwitchDisplay(DisplayTarget.Internal)));
         contextMenu.Items.Add(CreateMenuItem("切换到外接显示器（仅第二屏幕）", (_, _) => SwitchDisplay(DisplayTarget.External)));
         contextMenu.Items.Add(CreateMenuItem("切换当前显示器", (_, _) => SwitchDisplay(_configStore.GetNextToggleTarget())));
+        contextMenu.Items.Add(_startupMenuItem);
         contextMenu.Items.Add(new ToolStripSeparator());
         contextMenu.Items.Add(CreateMenuItem("复制 iPhone 快捷指令控制地址", (_, _) => CopyControlInfo()));
         contextMenu.Items.Add(CreateMenuItem("查看控制信息", (_, _) => ShowControlInfo()));
@@ -73,6 +80,7 @@ internal sealed class MonitorSwitcherApplicationContext : ApplicationContext
     private void HandleMenuOpening(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         _statusMenuItem.Text = $"当前状态: {GetStatusText()}";
+        _startupMenuItem.Checked = StartupManager.IsEnabled();
     }
 
     private ToolStripMenuItem CreateMenuItem(string text, EventHandler onClick)
@@ -152,6 +160,21 @@ internal sealed class MonitorSwitcherApplicationContext : ApplicationContext
     private void ExitApplication()
     {
         ExitThread();
+    }
+
+    private void ToggleStartup()
+    {
+        try
+        {
+            var enableStartup = !StartupManager.IsEnabled();
+            StartupManager.SetEnabled(enableStartup);
+            _startupMenuItem.Checked = enableStartup;
+            ShowBalloon(enableStartup ? "已启用开机自启动。" : "已关闭开机自启动。", ToolTipIcon.Info);
+        }
+        catch (Exception ex)
+        {
+            ShowBalloon($"设置开机自启动失败: {ex.Message}", ToolTipIcon.Error);
+        }
     }
 
     private void ShowBalloon(string message, ToolTipIcon icon)

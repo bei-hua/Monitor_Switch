@@ -40,8 +40,15 @@ dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=
 
 - 右键图标可以切换到主显示器
 - 右键图标可以切换到外接显示器
+- 右键图标可以开启或关闭开机自启动
 - 可以复制局域网控制地址到剪贴板
 - 双击图标会弹出当前可用控制地址
+
+开机自启动使用当前用户的注册表项：
+
+`HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`
+
+因此不需要管理员权限。建议在发布后的 exe 上开启自启动，这样开机后会直接启动正式程序路径。
 
 ## iPhone 快捷指令接入
 

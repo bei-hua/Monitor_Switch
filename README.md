@@ -56,7 +56,12 @@ dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=
 
 仓库已经配置了 GitHub Actions 自动发布流程。
 
-当你创建并推送形如 `v0.1.0` 的 tag 时，GitHub 会自动：
+你可以用两种方式发布：
+
+- 推送形如 `v0.1.0` 的 tag
+- 在 GitHub 网页的 Releases 页面手动创建并发布一个绑定到 `v0.1.0` 这类 tag 的 Release
+
+上述任一方式都会触发 GitHub 自动：
 
 - 在 Windows 环境编译项目
 - 生成 `win-x64` 自包含单文件发布包
@@ -64,17 +69,26 @@ dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=
 - 创建对应的 GitHub Release
 - 将 zip 附件上传到 Release 页面
 
-发布命令：
+命令行发布：
 
 ```bash
 git tag v0.1.0
 git push origin v0.1.0
 ```
 
+如果你更习惯在 GitHub 网页操作，可以直接：
+
+1. 打开仓库的 Releases 页面
+2. 点击 `Draft a new release`
+3. 选择或创建一个 `v0.1.0` 形式的 tag
+4. 点击 `Publish release`
+
+发布后，工作流会自动把构建好的 zip 附件上传到该 Release 页面。
+
 工作流文件位于：
 
 - `.github/workflows/build.yml`：普通构建
-- `.github/workflows/release.yml`：tag 触发的自动发布
+- `.github/workflows/release.yml`：tag 和 Release 页面都可触发的自动发布
 
 ## 托盘菜单
 

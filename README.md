@@ -52,6 +52,30 @@ dotnet publish -c Release -r win-x64 --self-contained true /p:PublishSingleFile=
 
 发布完成后，建议直接使用生成的 exe，并在该版本上开启“开机自启动”。
 
+## 发布 Release
+
+仓库已经配置了 GitHub Actions 自动发布流程。
+
+当你创建并推送形如 `v0.1.0` 的 tag 时，GitHub 会自动：
+
+- 在 Windows 环境编译项目
+- 生成 `win-x64` 自包含单文件发布包
+- 打包为 zip
+- 创建对应的 GitHub Release
+- 将 zip 附件上传到 Release 页面
+
+发布命令：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+工作流文件位于：
+
+- `.github/workflows/build.yml`：普通构建
+- `.github/workflows/release.yml`：tag 触发的自动发布
+
 ## 托盘菜单
 
 程序启动后不会弹出主窗口，而是常驻系统托盘。
